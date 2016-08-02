@@ -1,0 +1,12 @@
+<uwsgi>
+    <http>:9000</http>
+    <!--<socket>:9000</socket>-->
+    <chdir>/data/ddm</chdir>
+    <module>django_wsgi</module>
+    <master>1</master>
+    <processes>4</processes> <!-- 进程数 -->
+    <buffer-size>32768</buffer-size>
+    <daemonize>/data/ddm/logs/uwsgi.log</daemonize>
+    <touch-reload>/data/ddm/reload</touch-reload>
+    <pidfile>/data/ddm/uwsgi.pid</pidfile>
+</uwsgi>
