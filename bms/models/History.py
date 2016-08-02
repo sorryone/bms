@@ -5,6 +5,7 @@ __author__ = 'maxijie'
 
 
 class History(models.Model):
+    order_id = models.CharField(max_length=32, null=True)
     mac_type = models.CharField(max_length=32)
     pid = models.IntegerField(null=True)
     state = models.CharField(max_length=32)

@@ -54,6 +54,19 @@ def get_rank(request):
         return 0, data
 
 
+@api_view(["GET"])
+@api_result
+def get_one_rank(request):
+    if request.method == "GET":
+        try:
+            game_type = int(request.query_params.get("game_type"))
+        except:
+            return 1, "参数错误"
+
+        data = game_logics.get_one_rank(game_type)
+        return 0, data
+
+
 @api_view(['GET'])
 @api_result
 def get_game_list(request):
@@ -75,13 +88,13 @@ def get_game_list(request):
 def start_game(request):
     if request.method == "GET":
         try:
-            pid = int(request.query_params.get("pid"))
+            order_id = int(request.query_params.get("order_id"))
             machine_id = int(request.query_params.get("machine_id"))
             game_type = int(request.query_params.get("game_type"))
         except:
             return 1, "参数错误"
 
-        data = game_logics.start_game(pid, machine_id, game_type)
+        data = game_logics.start_game(order_id, machine_id, game_type)
         if not data:
             return 2, "数据错误"
         return 0, data
@@ -93,8 +106,7 @@ def end_game(request):
     if request.method == "POST":
         try:
             params = json.loads(request.body)
-            hid = int(params.get("hid"))
-            pid = int(params.get("pid"))
+            order_id = int(params.get("order_id"))
             machine_id = int(params.get("machine_id"))
             game_type = int(params.get("game_type"))
             score = int(params.get("score"))
@@ -105,7 +117,7 @@ def end_game(request):
             return 1, "参数错误"
 
         data = game_logics.end_game(
-            hid, pid, machine_id, game_type, score, is_finish, stage_id)
+            order_id, machine_id, game_type, score, is_finish, stage_id)
         if not data:
             return 2, "数据错误"
 

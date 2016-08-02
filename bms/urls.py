@@ -34,6 +34,7 @@ urlpatterns = patterns(
     # game views===============
     url(r'^game/$', 'bms.views.game.test'),
     url(r'^game/rank/', 'bms.views.game.get_rank'),
+    url(r'^game/onerank/', 'bms.views.game.get_one_rank'),
     url(r'^game/game_list/', 'bms.views.game.get_game_list'),
     url(r'^game/start/', 'bms.views.game.start_game'),
     url(r'^game/end/', 'bms.views.game.end_game'),
