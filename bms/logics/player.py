@@ -53,11 +53,30 @@ def get_or_create(wechat_data):
         pgd.star = 0
         pgd.save()
 
+    igon_list = (
+        "126",
+        "125",
+        "122",
+        "111",
+        "110",
+        "109",
+        "108"
+    )
+    igon_wechat_list = (
+        "oqeckwemV8djtGd3cFFhr8MshZhU",
+        "oqeckwd_I9d32X3fK-lIpgA3G0Zc",
+    )
+    if machine_id in igon_list:
+        total_fee = 1
+    elif openid in igon_wechat_list:
+        total_fee = 1
+    else:
+        total_fee = machine_obj.game.sale
     data = {
         "attach": machine_id,
         "body": machine_obj.game.body or "BellcatGame",
         "detail": machine_obj.game.detail,
-        "total_fee": machine_obj.game.sale,
+        "total_fee": total_fee,
         "product_id": machine_id
     }
 
