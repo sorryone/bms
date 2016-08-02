@@ -5,3 +5,5 @@ templates/
 static/
 uwsgi.pid
 *.pyc
+django_socket.xml
+start.sh
