@@ -54,6 +54,11 @@ INSTALLED_APPS = (
     "bms",
 )
 
+CRONJOBS = [
+    ('*/1 * * * *', 'bms.logics.consume.test',
+        ">> %s" % os.path.join(BASE_DIR, 'logs/test_crontab.log')),
+]
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

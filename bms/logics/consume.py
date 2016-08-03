@@ -5,7 +5,7 @@ from django.conf import settings
 from bms.models.Players import Players
 from bms.models.Machine import Machine
 from bms.models.Consume import Consume
-from lib.redis_model import HashModel, SortedSetModel
+from lib.redis_model import HashModel, SortedSetModel, ListModel
 from bms.models.History import History
 from bms.models.CheckPoint import CheckPoint
 from bms.models.Game import Game
@@ -23,8 +23,12 @@ class ConsumeMac(HashModel):
     pass
 
 
-class ConsumeList(HashModel):
+class ConsumeList(ListModel):
     pass
+
+
+def test():
+    print "this is test"
 
 
 def remove_order_list():
@@ -33,8 +37,8 @@ def remove_order_list():
     for game_id in game_types:
         for m_id in machine_ids:
             r_name = "Mac_%s_%s" % (m_id, game_id)
-            cm = ConsumeMac(r_name)
-            print cm, r_name
+            cm = ConsumeList(r_name)
+            cm.delete()
 
 
 def get_qrcode(game_type, macs):
@@ -93,19 +97,14 @@ def get_rank_top(game_type, pid):
 def get_one_rank(game_type):
     one_rank_name = "one_game_%s_rank" % game_type
     ors = OneRankSorted(one_rank_name)
-    players_list = ors.range(0, 9)
-    p_ids = []
-    for i in players_list:
-        if i[0] not in p_ids:
-            p_ids.append(i[0])
-
-    p_objs = Players.objects.filter(id__in=p_ids)
+    players_list = ors.range(0, 9, 1, 1)
     return_data = []
-    for p in p_objs:
+    for i in players_list:
+        p = Players.objects.get(id=i[0])
         return_data.append({
             "pid": p.id,
             "name": p.name,
-            "score": ors.score(p.id) or 0,
+            "score": i[1],
             "avatar_file": p.avatar_file
         })
 
@@ -115,17 +114,30 @@ def get_one_rank(game_type):
 def start_game(order_id, machine_id, game_type):
     mac_name = "Mac_%s_%s" % (machine_id, game_type)
     cl = ConsumeList(mac_name)
-    game_data = cl.get_value(order_id)
-    if game_data:
-        game_data = json.loads(game_data)
-    else:
+    game_list = cl.range(0, -1)
+    game_data = None
+    for i in game_list:
+        d = json.loads(i)
+        if d.get("order_id", 0) == order_id:
+            game_data = d
+            break
+
+    if not game_data:
         return False
 
     try:
-        History.objects.create(order_id=order_id, pid=game_data["pid"],
-                               mac_type=mac_name, state="start")
+        h, is_create = History.objects.get_or_create(order_id=order_id)
     except History.DoesNotExist:
         return False
+
+    else:
+        if h.state == "end":
+            return False
+        if is_create:
+            h.state = "start"
+            h.pid = game_data["pid"]
+            h.mac_type = mac_name
+            h.save()
 
     return True
 
@@ -211,6 +223,7 @@ def write_consume_to_redis(machine_obj, player_obj, cons_obj):
 
     mac_name = "Mac_%s_%s" % (machine_obj.id, machine_obj.game.id)
     cl = ConsumeList(mac_name)
+    # cl.set_value(cons_obj.id, json.dumps(temp))
     cl.rpush(json.dumps(temp))
 
 
@@ -245,8 +258,8 @@ def get_consume_to_redis(mac, game_type):
 
     mac_name = "Mac_%s_%s" % (m.id, m.game.id)
     cl = ConsumeList(mac_name)
-    ls = cl.get_all()
-    # ls = cl.range(0, -1)
+    # ls = cl.get_all()
+    ls = cl.range(0, -1)
     return_list = []
     for index, i in enumerate(ls):
         return_list.append(json.loads(i))
