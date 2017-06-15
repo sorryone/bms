@@ -50,12 +50,13 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django_crontab",
     "rest_framework",
     "bms",
 )
 
 CRONJOBS = [
-    ('*/1 * * * *', 'bms.logics.consume.test',
+    ('01 06 * * *', 'bms.logics.consume.remove_order_list',
         ">> %s" % os.path.join(BASE_DIR, 'logs/test_crontab.log')),
 ]
 

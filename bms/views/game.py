@@ -69,6 +69,23 @@ def get_one_rank(request):
 
 @api_view(['GET'])
 @api_result
+def check_coupon(request):
+    if request.method == "GET":
+        try:
+            game_type = int(request.query_params.get("game_type"))
+            coupon = int(request.query_params.get("coupon"))
+        except:
+            return 1, "参数错误"
+
+        data = game_logics.checkCoupon(coupon, game_type)
+        if data is False:
+            return 0, "兑换码失效"
+
+        return 0, data
+
+
+@api_view(['GET'])
+@api_result
 def get_game_list(request):
     if request.method == "GET":
         try:
@@ -77,6 +94,8 @@ def get_game_list(request):
         except:
             return 1, "参数错误"
 
+        # 临时注释
+        return 0, {}
         data = game_logics.get_consume_to_redis(mac, game_type)
         if data is False:
             return 2, "数据错误"

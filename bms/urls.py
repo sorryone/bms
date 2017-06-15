@@ -39,6 +39,7 @@ urlpatterns = patterns(
     url(r'^game/start/', 'bms.views.game.start_game'),
     url(r'^game/end/', 'bms.views.game.end_game'),
     url(r'^game/qrcode/', 'bms.views.game.get_qrcode'),
+    url(r'^game/check_coupon/', 'bms.views.game.check_coupon'),
 
 )
 

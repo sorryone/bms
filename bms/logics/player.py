@@ -54,6 +54,7 @@ def get_or_create(wechat_data):
         pgd.save()
 
     igon_list = (
+        "130",
         "128",
         "127",
         "126",

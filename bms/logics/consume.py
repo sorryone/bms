@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import uuid
 import datetime
 from django.conf import settings
 from bms.models.Players import Players
@@ -27,8 +28,34 @@ class ConsumeList(ListModel):
     pass
 
 
+class CouponList(ListModel):
+    pass
+
+
 def test():
     print "this is test"
+
+
+def createCoupon(num, game_type):
+    return_list = []
+    cl = CouponList("CouponList_game_%s" % game_type)
+    for i in range(num):
+        a = uuid.uuid1().get_hex()
+        x = uuid.UUID(a)
+        s = str(x.int)[4: 20]
+        cl.lpush(s)
+        return_list.append(s)
+
+    return return_list
+
+
+def checkCoupon(s, game_type):
+    cl = CouponList("CouponList_game_%s" % game_type)
+    res = cl.remove(s)
+    if res:
+        return True
+    else:
+        return False
 
 
 def remove_order_list():
